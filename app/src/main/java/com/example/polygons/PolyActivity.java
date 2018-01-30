@@ -1,8 +1,11 @@
 package com.example.polygons;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
-import android.icu.text.SymbolTable;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +16,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Cap;
 import com.google.android.gms.maps.model.CustomCap;
 import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.Dot;
@@ -23,11 +25,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polygon;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,6 +40,7 @@ import static com.example.polygons.R.id.map;
  * An activity that displays a Google map with polylines to represent paths or routes,
  * and polygons to represent areas.
  */
+
 public class PolyActivity extends AppCompatActivity
         implements
                 OnMapReadyCallback,
@@ -60,7 +61,6 @@ public class PolyActivity extends AppCompatActivity
     private static final PatternItem DOT = new Dot();
     private static final PatternItem DASH = new Dash(PATTERN_DASH_LENGTH_PX);
     private static final PatternItem GAP = new Gap(PATTERN_GAP_LENGTH_PX);
-
     // Create a stroke pattern of a gap followed by a dot.
     private static final List<PatternItem> PATTERN_POLYLINE_DOTTED = Arrays.asList(GAP, DOT);
 
@@ -81,8 +81,8 @@ public class PolyActivity extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(map);
         mapFragment.getMapAsync(this);
-
     }
+
 
     /**
      * Manipulates the map when it's available.
@@ -119,49 +119,20 @@ public class PolyActivity extends AppCompatActivity
                 .title("Start")
         );
 
-        Polyline polyline2 = mMap.addPolyline(new PolylineOptions()
-                .clickable(true)
-                .add(
-                        new LatLng(-29.501, 119.700),
-                        new LatLng(-27.456, 119.672),
-                        new LatLng(-25.971, 124.187),
-                        new LatLng(-28.081, 126.555),
-                        new LatLng(-28.848, 124.229),
-                        new LatLng(-28.215, 123.938)));
-        polyline2.setTag("B");
-        stylePolyline(polyline2);
-
-        // Add polygons to indicate areas on the map.
-        Polygon polygon1 = mMap.addPolygon(new PolygonOptions()
-                .clickable(true)
-                .add(
-                        new LatLng(-27.457, 153.040),
-                        new LatLng(-33.852, 151.211),
-                        new LatLng(-37.813, 144.962),
-                        new LatLng(-34.928, 138.599)));
-        // Store a data object with the polygon, used here to indicate an arbitrary type.
-        polygon1.setTag("alpha");
-        // Style the polygon.
-        stylePolygon(polygon1);
-
-        Polygon polygon2 = mMap.addPolygon(new PolygonOptions()
-                .clickable(true)
-                .add(
-                        new LatLng(-31.673, 128.892),
-                        new LatLng(-31.952, 115.857),
-                        new LatLng(-17.785, 122.258),
-                        new LatLng(-12.4258, 130.7932)));
-        polygon2.setTag("beta");
-        stylePolygon(polygon2);
-        // Position the map's camera near Alice Springs in the center of Australia,
-        // and set the zoom factor so most of Australia shows on the screen.
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.163948,4.139600 ), 16));
-
         mMap.setOnPolylineClickListener(this);
        mMap.setOnPolygonClickListener(this);
         if ((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
             mMap.setMyLocationEnabled(true);
         }
+        LocationManager locationManager = (LocationManager)
+                getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+
+        Location myLocation = locationManager.getLastKnownLocation(locationManager
+                .getBestProvider(criteria, false));
+        LatLng huidigeLocatie = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+        mMap.addMarker(new MarkerOptions().position(huidigeLocatie).title("ik"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(myLocation.getLatitude(),myLocation.getLongitude() ), 16));
     }
 
     /**
@@ -264,5 +235,8 @@ public class PolyActivity extends AppCompatActivity
         polygon.setFillColor(color);
 
         Toast.makeText(this, "Area type " + polygon.getTag().toString(), Toast.LENGTH_SHORT).show();
+    }
+    public  void getCurrentLocation (Location location){
+
     }
 }
