@@ -37,6 +37,8 @@ import static android.graphics.Color.rgb;
 
 import static com.example.polygons.R.id.map;
 
+import static java.lang.StrictMath.toRadians;
+
 
 /**
  * An activity that displays a Google map with polylines to represent paths or routes,
@@ -138,6 +140,28 @@ public class PolyActivity extends AppCompatActivity
         LatLng huidigeLocatie = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
         mMap.addMarker(new MarkerOptions().position(huidigeLocatie).title("ik"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(myLocation.getLatitude(),myLocation.getLongitude() ), 16));
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+
+            String afstand = Double.toString(afstand(huidigeLocatie, Start ));
+            builder1.setMessage(afstand);
+            builder1.setCancelable(true);
+            builder1.setPositiveButton(
+                    "Yes",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            builder1.setNegativeButton(
+                    "No",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alert11 = builder1.create();
+            alert11.show();
         } catch (Exception name) {
 
             AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
@@ -266,7 +290,15 @@ public class PolyActivity extends AppCompatActivity
 
         Toast.makeText(this, "Area type " + polygon.getTag().toString(), Toast.LENGTH_SHORT).show();
     }
-    public  void getCurrentLocation (Location location){
-
-    }
+    public double afstand(LatLng p1, LatLng p2){
+        double R = 6378137; // Earth’s mean radius in meter
+        double dLat = toRadians(p2.latitude - p1.latitude);
+        double dLong = toRadians(p2.latitude - p1.latitude);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(toRadians(p1.latitude)) * Math.cos(toRadians(p2.latitude)) *
+                        Math.sin(dLong / 2) * Math.sin(dLong / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double d = R * c;
+        return d;
+    };
 }
