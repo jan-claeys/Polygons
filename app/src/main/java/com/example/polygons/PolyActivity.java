@@ -2,12 +2,14 @@ package com.example.polygons;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
@@ -92,6 +94,9 @@ public class PolyActivity extends AppCompatActivity
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        try {
+
+
         mMap = googleMap;
         // Add polylines to the map.
         // Polylines are useful to show a route or some other connection between points.
@@ -133,7 +138,32 @@ public class PolyActivity extends AppCompatActivity
         LatLng huidigeLocatie = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
         mMap.addMarker(new MarkerOptions().position(huidigeLocatie).title("ik"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(myLocation.getLatitude(),myLocation.getLongitude() ), 16));
+        } catch (Exception name) {
+
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+            builder1.setMessage("Er is geen locatie beschikbaar");
+            builder1.setCancelable(true);
+            builder1.setPositiveButton(
+                    "Yes",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            builder1.setNegativeButton(
+                    "No",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alert11 = builder1.create();
+            alert11.show();
+
+        }
     }
+
 
     /**
      * Styles the polyline, based on type.
